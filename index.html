@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Summarizer</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        margin: 0;
+        padding: 0;
+        color: #333;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 60px auto;
+        padding: 25px;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #2563eb;
+        margin-bottom: 5px;
+    }
+
+    h3 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 25px;
+        color: #555;
+        font-weight: normal;
+    }
+
+    p {
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    textarea {
+        height: 140px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+        resize: none;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+
+    button {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        padding: 10px;
+        font-size: 15px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #1d4ed8;
+    }
+
+    #summary-output {
+        margin-top: 20px;
+        background: #f1f5f9;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+    }
+
+    #summary-heading {
+        margin: 0 0 8px 0;
+        color: #111;
+    }
+
+    #summary-text {
+        font-size: 14px;
+        color: #333;
+    }
+</style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Text Summarizer</h1>
+    <h3>using HuggingFace Transformer</h3>
+    <p>Paste your content below and get a quick summary.</p>
+
+    <form id="summarization-form">
+        <textarea id="dialogue-input" placeholder="Enter your content here..." required></textarea>
+        <button type="submit">Summarize</button>
+    </form>
+
+    <div id="summary-output">
+        <h3 id="summary-heading">Summary</h3>
+        <p id="summary-text"></p>
+    </div>
+</div>
+
+<script>
+document.getElementById("summarization-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const dialogueInput = document.getElementById("dialogue-input");
+    const summaryText = document.getElementById("summary-text");
+    const button = e.target.querySelector("button");
+
+    const dialogue = dialogueInput.value.trim();
+    if (!dialogue) return;
+
+    summaryText.innerText = "Processing...";
+    button.disabled = true;
+
+    try {
+        const response = await fetch("/summarize/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dialogue })
+        });
+
+        const data = await response.json();
+        summaryText.innerText = data.summary;
+    } catch (error) {
+        summaryText.innerText = "Error occurred";
+    }
+
+    button.disabled = false;
+});
+</script>
+</body>
+</html>
